@@ -4,6 +4,6 @@ Lautaro Riquelme Nicolas
 
 Joaquin Limaco Villca
 
-Yair Villca Juaniquina
+Yair Ariel Villca Juaniquina
 
 Victor Santiago Exequiel Jara
