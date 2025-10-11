@@ -2,7 +2,7 @@
 
 Lautaro Riquelme Nicolas
 
-Joaquin Limaco  
+Joaquin Elias Limaco Rodriguez
 
 Yair Ariel Villca Juaniquina
 
