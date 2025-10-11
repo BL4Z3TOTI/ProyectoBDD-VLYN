@@ -1,13 +1,12 @@
 import mysql.connector
 from mysql.connector import errorcode
 
-# --- Configuración de la Conexión ---
 DB_HOST = "localhost"
 DB_USER = "root"  
 DB_PASSWORD = "12345678"
 DB_NAME = "votos_profes"
 
-# --- Definición del Esquema de la Base de Datos ---
+
 TABLES = {}
 TABLES['profesores'] = (
     "CREATE TABLE profesores ("
@@ -28,7 +27,7 @@ TABLES['votos'] = (
     ") ENGINE=InnoDB"
 )
 
-# --- Profesores Iniciales ---
+
 INITIAL_PROFESSORS = [
     ("Carlos Carden", "Base de datos"),
 ]
@@ -36,10 +35,10 @@ INITIAL_PROFESSORS = [
 def create_database(cursor):
     try:
         cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME} DEFAULT CHARACTER SET 'utf8'")
-        print(f"Base de datos '{DB_NAME}' creada o ya existente.")
+        print(f"la base de datos '{DB_NAME}' fue creada o ya existe.")
         cursor.execute(f"USE {DB_NAME}")
     except mysql.connector.Error as err:
-        print(f"Error al crear la base de datos: {err}")
+        print(f"error al crear la base de datos: {err}")
         exit(1)
 
 
@@ -54,7 +53,7 @@ def create_tables(cursor):
             else:
                 print(err.msg)
         else:
-            print("OK.")
+            print("ok")
 
 def populate_professors(cnx, cursor):
     insert_prof_query = "INSERT IGNORE INTO profesores (nombre, departamento) VALUES (%s, %s)"
