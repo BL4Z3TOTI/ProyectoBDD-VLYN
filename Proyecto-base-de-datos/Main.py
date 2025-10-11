@@ -1,106 +1,89 @@
 import mysql.connector
-from mysql.connector import errorcode
+from mysql.connector import Error
 
-# --- Configuración de la Conexión ---
-DB_HOST = "localhost"
-DB_USER = "root"  
-DB_PASSWORD = "12345678"
-DB_NAME = "votos_profes"
+DB_HOST = 'localhost'
+DB_NAME = 'proyectobasededatosuep'
+DB_USER = 'root'
+DB_PASSWORD = 'contraseñaultrasecretabasededatos' 
 
-# --- Definición del Esquema de la Base de Datos ---
-TABLES = {}
-TABLES['profesores'] = (
-    "CREATE TABLE profesores ("
-    "  id INT PRIMARY KEY AUTO_INCREMENT,"
-    "  nombre VARCHAR(50) NOT NULL,"
-    "  departamento VARCHAR(50)"
-    ") ENGINE=InnoDB"
-)
-
-
-TABLES['votos'] = (
-    "CREATE TABLE votos ("
-    "  id INT PRIMARY KEY AUTO_INCREMENT,"
-    "  profesor_id INT NOT NULL,"
-    "  estudiante_id VARCHAR(20) NOT NULL UNIQUE," 
-    "  voto_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-    "  FOREIGN KEY (profesor_id) REFERENCES profesores(id)"
-    ") ENGINE=InnoDB"
-)
-
-# --- Profesores Iniciales ---
-INITIAL_PROFESSORS = [
-    ("Carlos Carden", "Base de datos"),
-]
-
-def create_database(cursor):
+def crear_tablas_uep():
+    conexion = None
     try:
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME} DEFAULT CHARACTER SET 'utf8'")
-        print(f"Base de datos '{DB_NAME}' creada o ya existente.")
-        cursor.execute(f"USE {DB_NAME}")
-    except mysql.connector.Error as err:
-        print(f"Error al crear la base de datos: {err}")
-        exit(1)
-
-
-def create_tables(cursor):
-    for name, ddl in TABLES.items():
-        try:
-            print(f"Creando tabla {name}: ", end='')
-            cursor.execute(ddl)
-        except mysql.connector.Error as err:
-            if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-                print("ya existe.")
-            else:
-                print(err.msg)
-        else:
-            print("OK.")
-
-def populate_professors(cnx, cursor):
-    insert_prof_query = "INSERT IGNORE INTO profesores (nombre, departamento) VALUES (%s, %s)"
-    
-
-    cursor.execute("SELECT COUNT(*) FROM profesores")
-    if cursor.fetchone()[0] == 0:
-        print("Insertando profesores iniciales...")
-
-        try:
-            for prof in INITIAL_PROFESSORS:
-                cursor.execute(insert_prof_query, prof)
-            cnx.commit()
-            print(f"{len(INITIAL_PROFESSORS)} profesores insertados.")
-
-        except mysql.connector.Error as err:
-            print(f"Error al insertar datos: {err}")
-            cnx.rollback()
-    else:
-        print("La tabla de profesores ya contiene datos.")
-
-def setup_db():
-    try:
-        cnx = mysql.connector.connect(
+        conexion = mysql.connector.connect(
             host=DB_HOST,
+            database=DB_NAME,
             user=DB_USER,
             password=DB_PASSWORD
         )
-    except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-            print("Error: El nombre de usuario o contraseña de MySQL es incorrecto.")
-        elif err.errno == errorcode.CR_CONN_ERROR:
-            print("Error: No se pudo conectar al servidor MySQL. Asegúrate de que esté corriendo.")
-        else:
-            print(err)
-        return
 
-    cursor = cnx.cursor()
+        if conexion.is_connected():
+            cursor = conexion.cursor()
+            
+            sql_usuarios = """
+            CREATE TABLE IF NOT EXISTS usuarios (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(50) NOT NULL UNIQUE,
+                password_hash VARCHAR(255) NOT NULL,
+                rol VARCHAR(20) NOT NULL
+            );
+            """
+            cursor.execute(sql_usuarios)
 
-    create_database(cursor)
-    create_tables(cursor)
-    populate_professors(cnx, cursor)
+            sql_profesores = """
+            CREATE TABLE IF NOT EXISTS profesores (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                usuario_id INT NOT NULL UNIQUE,
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+            );
+            """
+            cursor.execute(sql_profesores)
 
-    cursor.close()
-    cnx.close()
-    print("\nConfiguración de la base de datos completada.")
+            sql_administradores = """
+            CREATE TABLE IF NOT EXISTS administradores (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                usuario_id INT NOT NULL UNIQUE,
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+            );
+            """
+            cursor.execute(sql_administradores)
 
-if __name__ == '__main__':
-    setup_db()
+            sql_estudiantes = """
+            CREATE TABLE IF NOT EXISTS estudiantes (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                usuario_id INT NOT NULL UNIQUE,
+                matricula VARCHAR(20) UNIQUE,
+                nombre VARCHAR(100) NOT NULL,
+                apellido VARCHAR(100) NOT NULL,
+                email VARCHAR(100) UNIQUE,
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+            );
+            """
+            cursor.execute(sql_estudiantes)
+
+            sql_votos = """
+            CREATE TABLE IF NOT EXISTS votos (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                estudiante_id INT NOT NULL,
+                profesor_id INT NOT NULL,
+                voto INT NOT NULL CHECK (voto >= 1 AND voto <= 5),
+                fecha_voto TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id),
+                FOREIGN KEY (profesor_id) REFERENCES profesores(id),
+                UNIQUE KEY unique_voto (estudiante_id, profesor_id)
+            );
+            """
+            cursor.execute(sql_votos)
+            
+            conexion.commit()
+
+    except Error:
+        pass
+
+    finally:
+        if 'conexion' in locals() and conexion and conexion.is_connected():
+            if 'cursor' in locals() and cursor:
+                cursor.close()
+            conexion.close()
+
+if __name__ == "__main__":
+    crear_tablas_uep()
