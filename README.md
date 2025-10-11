@@ -1,8 +1,8 @@
-# ProyectoBDD-VLYNÇ
+# ProyectoBDD-VLYN
 
 Lautaro Riquelme Nicolas
 
-Joaquin Limaco Villca
+Joaquin Elias Limaco Rodriguez
 
 Yair Ariel Villca Juaniquina
 
