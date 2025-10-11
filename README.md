@@ -1,4 +1,4 @@
-# ProyectoBDD-VLYNÇ
+# ProyectoBDD-VLYN
 
 Lautaro Riquelme Nicolas
 
