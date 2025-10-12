@@ -85,7 +85,7 @@ def setup_db():
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Error: El nombre de usuario o contraseña de MySQL es incorrecto.")
-        elif err.errno == errorcode.CR_CONN_ERROR:
+        elif err.errno == errorcode.CR_CONNECTION_ERROR:
             print("Error: No se pudo conectar al servidor MySQL. Asegúrate de que esté corriendo.")
         else:
             print(err)
