@@ -29,14 +29,19 @@ def crear_tablas_uep():
             """
             cursor.execute(sql_usuarios)
 
+            # --- CÓDIGO MODIFICADO ---
+            # Se añaden 'nombre' y 'departamento' para cumplir con votacion.py y estudiantes_ver_profesores.py
             sql_profesores = """
             CREATE TABLE IF NOT EXISTS profesores (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 usuario_id INT NOT NULL UNIQUE,
+                nombre VARCHAR(100) NOT NULL,      
+                departamento VARCHAR(100),         
                 FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
             );
             """
             cursor.execute(sql_profesores)
+            # -------------------------
 
             sql_administradores = """
             CREATE TABLE IF NOT EXISTS administradores (
