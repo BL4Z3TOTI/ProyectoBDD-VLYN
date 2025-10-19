@@ -2,18 +2,13 @@ import mysql.connector
 from mysql.connector import Error
 from Main import crear_tablas_uep # Importamos la función de Main.py
 
-# --- Constantes de Conexión (Tomadas de Main.py y RegistroDeUsuarios.py) ---
 DB_HOST = 'localhost'
 DB_NAME = 'proyectobasededatosuep'
 DB_USER = 'root'
 DB_PASSWORD = 'contraseñaultrasecretabasededatos' 
-# --------------------------------------------------------------------------
 
 def ver_todos_para_admin():
-    """
-    Se conecta a la base de datos y recupera la lista de estudiantes
-    y la lista de profesores.
-    """
+    
     conexion = None
     cursor = None # Inicializar cursor fuera del try para el finally
     try:
@@ -27,7 +22,6 @@ def ver_todos_para_admin():
         if conexion.is_connected():
             cursor = conexion.cursor(dictionary=True)
 
-            # Consulta para Estudiantes
             cursor.execute("""
                 SELECT e.id, e.nombre, e.apellido, e.matricula, e.email, u.username
                 FROM estudiantes e
@@ -35,7 +29,6 @@ def ver_todos_para_admin():
             """)
             estudiantes = cursor.fetchall()
 
-            # Consulta para Profesores
             cursor.execute("""
                 SELECT p.id, p.nombre, p.departamento, u.username
                 FROM profesores p
@@ -50,7 +43,6 @@ def ver_todos_para_admin():
         return [], []
 
     finally:
-        # Cerrar cursor y conexión de manera segura
         if 'cursor' in locals() and cursor:
             cursor.close()
         if 'conexion' in locals() and conexion and conexion.is_connected():
@@ -59,7 +51,6 @@ def ver_todos_para_admin():
 
 if __name__ == "__main__":
 
-    # Esto asegura que las tablas existan antes de intentar consultarlas.
     crear_tablas_uep() 
 
     estudiantes, profesores = ver_todos_para_admin()
@@ -74,7 +65,6 @@ if __name__ == "__main__":
     print("\n=== Profesores ===")
     if profesores:
         for p in profesores:
-            # Se ha modificado la consulta para incluir 'nombre' y 'departamento' del profesor.
             print(f"ID: {p['id']}, Nombre: {p['nombre']}, Departamento: {p['departamento']}, Usuario: {p['username']}")
     else:
         print("No hay profesores registrados.")
