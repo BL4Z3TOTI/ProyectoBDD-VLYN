@@ -1,24 +1,24 @@
+
 import mysql.connector
 from mysql.connector import Error
+from modelos.conexion_BD import obtener_conexion_db
 
-DB_HOST = 'localhost'
-DB_NAME = 'proyectobasededatosuep'
-DB_USER = 'root'
-DB_PASSWORD = 'contraseñaultrasecretabasededatos' 
+class IniciarTablas:
 
-def crear_tablas_uep():
-    conexion = None
-    try:
-        conexion = mysql.connector.connect(
-            host=DB_HOST,
-            database=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD
-        )
 
-        if conexion.is_connected():
+    def inicializar_tablas(self):
+ 
+        conexion = obtener_conexion_db()
+        
+        if not conexion:
+            print("🔴 No se pudo inicializar las tablas debido a un error de conexión.")
+            return
+
+        cursor = None
+        try:
             cursor = conexion.cursor()
             
+
             sql_usuarios = """
             CREATE TABLE IF NOT EXISTS usuarios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -40,7 +40,6 @@ def crear_tablas_uep():
             """
             cursor.execute(sql_profesores)
             
-
             sql_administradores = """
             CREATE TABLE IF NOT EXISTS administradores (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -63,30 +62,30 @@ def crear_tablas_uep():
             """
             cursor.execute(sql_estudiantes)
 
+
             sql_votos = """
             CREATE TABLE IF NOT EXISTS votos (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                estudiante_id INT NOT NULL,
+                estudiante_id INT NOT NULL UNIQUE,
                 profesor_id INT NOT NULL,
-                voto INT NOT NULL CHECK (voto >= 1 AND voto <= 5),
+                voto INT NOT NULL DEFAULT 1, 
                 fecha_voto TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id),
-                FOREIGN KEY (profesor_id) REFERENCES profesores(id),
-                UNIQUE KEY unique_voto (estudiante_id, profesor_id)
+                FOREIGN KEY (profesor_id) REFERENCES profesores(id)
             );
             """
             cursor.execute(sql_votos)
             
             conexion.commit()
+            print(" Tablas de la Base de Datos verificadas/creadas con éxito.")
 
-    except Error:
-        pass
+        except Error as e:
+            print(f" Error al crear/verificar tablas: {e}")
+            if conexion:
+                conexion.rollback()
 
-    finally:
-        if 'conexion' in locals() and conexion and conexion.is_connected():
-            if 'cursor' in locals() and cursor:
+        finally:
+            if cursor:
                 cursor.close()
-            conexion.close()
-
-if __name__ == "__main__":
-    crear_tablas_uep()
+            if conexion and conexion.is_connected():
+                conexion.close()
