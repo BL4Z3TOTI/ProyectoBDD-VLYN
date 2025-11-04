@@ -25,6 +25,8 @@ class ControladorAdministrador:
             elif opcion == '2':
                 self._manejar_ver_resultados()
             elif opcion == '3':
+                self._manejar_baja_profesores()
+            elif opcion == '4':
                 self.vista.mostrar_mensaje("Saliendo del menú de administrador.")
                 break
             else:
