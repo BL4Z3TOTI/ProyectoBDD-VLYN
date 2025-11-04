@@ -4,6 +4,11 @@ from modelos.modelo_profesor import ModeloProfesor
 
 class ControladorProfesor:
     
+    # TAREA 1: Modificar constructor para aceptar user_id
+    def __init__(self, user_id=None):
+        self.vista = VistaProfesor()
+        self.modelo_profesor = ModeloProfesor()
+        self.user_id = user_id
     def __init__(self):
         self.vista = VistaProfesor()
         self.modelo_profesor = ModeloProfesor()

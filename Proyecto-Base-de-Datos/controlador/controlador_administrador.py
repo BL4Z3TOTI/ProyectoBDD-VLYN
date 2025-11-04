@@ -7,6 +7,11 @@ import mysql.connector
 
 class ControladorAdministrador:
     
+    # TAREA 1: Modificar constructor para aceptar user_id
+    def __init__(self, user_id=None):
+        self.vista = VistaAdministrador()
+        self.modelo_votacion = ModeloVotacion()
+        self.user_id = user_id
     def __init__(self):
         self.vista = VistaAdministrador()
         self.modelo_votacion = ModeloVotacion()
@@ -25,6 +30,12 @@ class ControladorAdministrador:
             elif opcion == '2':
                 self._manejar_ver_resultados()
             elif opcion == '3':
+                self.vista.mostrar_mensaje("Saliendo del menu de administrador.")
+                break
+            else:
+                self.vista.mostrar_mensaje("Opcion no valida. Intenta de nuevo.")
+                self._manejar_baja_profesores()
+            elif opcion == '4':
                 self.vista.mostrar_mensaje("Saliendo del menú de administrador.")
                 break
             else:
@@ -75,6 +86,11 @@ class ControladorAdministrador:
         pin_votos = self.vista.solicitar_pin()
         
         if pin_votos != PIN_ADMIN_VOTOS:
+            self.vista.mostrar_mensaje("PIN de resultados de votacion incorrecto.")
+            return
+
+        resultados, total_votos = self.modelo_votacion.obtener_resultados()
+        self.vista.mostrar_resultados_votacion(resultados, total_votos)
             self.vista.mostrar_mensaje("❌ PIN de resultados de votación incorrecto.")
             return
 
