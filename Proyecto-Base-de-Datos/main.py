@@ -1,13 +1,11 @@
-
 from modelos.iniciar_tablas import IniciarTablas
 from controlador.controlador_administrador import ControladorAdministrador
 from controlador.controlador_estudiante import ControladorEstudiante
 from controlador.controlador_profesor import ControladorProfesor
-from modelos.modelo_usuario import ModeloUsuario # TAREA 1: Nueva Importación
+from modelos.modelo_usuario import ModeloUsuario 
 import traceback 
 
 def mostrar_menu_principal():
-    # TAREA 1: Menú de Login
     print("\n==================================")
     print("=== PROYECTO BASE DE DATOS ===")
     print("==================================")
@@ -15,42 +13,46 @@ def mostrar_menu_principal():
     print("2. Registrar nuevo estudiante")
     print("3. Salir")
     opcion = input("Selecciona una opcion: ").strip()
-
-def mostrar_menu_principal():
-    print("=== PROYECTO BASE DE DATOS ===")
-    print("1. Menú Estudiante (Registro y Votación)")
-    print("2. Menú Profesor (Consultar Votantes)")
-    print("3. Menú Administrador")
-    print("4. Salir")
-    opcion = input("Selecciona una opción: ").strip()
     return opcion
 
 if __name__ == "__main__":
     
-    # 1. Inicializa las tablas de la DB antes de que empiece el menú
     iniciador = IniciarTablas()
     iniciador.inicializar_tablas()
 
     print("Inicializacion de DB completada. Iniciando menu interactivo...")
 
-    # 2. Bucle principal para manejar el LOGIN/REGISTRO
-    iniciador = IniciarTablas()
-    iniciador.inicializar_tablas()
-
     while True:
         opcion = mostrar_menu_principal()
 
         if opcion == '1':
-            username = input("Usuario: ").strip()
-            password = input("Contrasena: ").strip()
             
-            modelo_usuario = ModeloUsuario()
-            user_id, rol, mensaje = modelo_usuario.iniciar_sesion(username, password)
+            print("\n--- SELECCIÓN DE ROL ---")
+            print("1. Estudiante")
+            print("2. Profesor")
+            print("3. Administrador")
+            opcion_rol = input("Ingresa tu rol (1-3): ").strip()
+            
+            user_id, rol, mensaje = None, None, "Login cancelado o rol no válido."
+            
+            if opcion_rol == '1':
+                controlador_estudiante = ControladorEstudiante() 
+                user_id, rol, mensaje = controlador_estudiante.iniciar_login_estudiante() # Nuevo método
+                
+            elif opcion_rol in ('2', '3'):
+                rol_str = 'Profesor' if opcion_rol == '2' else 'Administrador'
+                username = input(f"Usuario ({rol_str}): ").strip()
+                password = input("Contrasena: ").strip()
+                
+                modelo_usuario = ModeloUsuario()
+                user_id, rol, mensaje = modelo_usuario.iniciar_sesion(username, password)
+                
+                if user_id and rol != rol_str:
+                    user_id, rol, mensaje = None, None, f"Login fallido: El usuario '{username}' es de rol '{rol}', no '{rol_str}'."
             
             print(mensaje)
             
             if user_id and rol:
-                # Redirige a los menús específicos, pasando el ID de usuario
                 if rol == 'Estudiante':
                     controlador_estudiante = ControladorEstudiante(user_id=user_id)
                     controlador_estudiante.iniciar_menu() 
@@ -62,7 +64,6 @@ if __name__ == "__main__":
                     controlador_admin.iniciar_menu()
                     
         elif opcion == '2':
-            # La opcion 2 ahora es el registro
             controlador_estudiante = ControladorEstudiante()
             controlador_estudiante._manejar_registro() 
             
@@ -71,16 +72,3 @@ if __name__ == "__main__":
             break
         else:
             print("Opcion no valida. Intenta de nuevo.")
-            controlador_estudiante = ControladorEstudiante()
-            controlador_estudiante.iniciar_menu()
-        elif opcion == '2':
-            controlador_profesor = ControladorProfesor()
-            controlador_profesor.iniciar_consulta()
-        elif opcion == '3':
-            controlador_admin = ControladorAdministrador()
-            controlador_admin.iniciar_menu()
-        elif opcion == '4':
-            print("Cerrando la aplicación. ¡Hasta pronto! 👋")
-            break
-        else:
-            print("Opción no válida. Intenta de nuevo.")
