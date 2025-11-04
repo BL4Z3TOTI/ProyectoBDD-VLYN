@@ -38,6 +38,7 @@ class ModeloVotacion:
     def registrar_voto(self, id_estudiante, id_profesor):
         cnx = self._obtener_conexion()
         if not cnx: 
+            return False, "Error de conexion a la base de datos."
             return False, "Error de conexión a la base de datos."
         
         cursor = cnx.cursor()
@@ -45,12 +46,14 @@ class ModeloVotacion:
             consulta_voto = "INSERT INTO votos (profesor_id, estudiante_id) VALUES (%s, %s)" 
             cursor.execute(consulta_voto, (id_profesor, id_estudiante))
             cnx.commit()
+            return True, "Voto registrado con exito."
             return True, "Voto registrado con éxito."
         
         except mysql.connector.Error as e:
             cnx.rollback()
             mensaje_error = f"Error al registrar voto: {e}"
             if e.errno == 1062:
+                mensaje_error = "Ya existe un voto registrado para este estudiante."
                 mensaje_error = "❌ Ya existe un voto registrado para este estudiante."
             return False, mensaje_error
             
@@ -121,6 +124,7 @@ class ModeloVotacion:
             return resultados, total_votos
 
         except mysql.connector.Error as e:
+            print(f"Error al obtener resultados de votacion: {e}")
             print(f"❌ Error al obtener resultados de votación: {e}")
             return [], 0
             
