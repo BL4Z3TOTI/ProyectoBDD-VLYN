@@ -20,6 +20,8 @@ class ControladorEstudiante:
         self.user_id = user_id 
         self.rol = 'Estudiante'
 
+    def iniciar_menu(self):
+        if self.user_id is None:
     # TAREA 1: Modificar iniciar_menu para el flujo logueado
     def iniciar_menu(self):
         if self.user_id is None:
@@ -43,6 +45,10 @@ class ControladorEstudiante:
                 if opcion == '1':
                     self._manejar_votacion()
                 elif opcion == '2':
+                    self._manejar_edicion_perfil() 
+                elif opcion == '3':
+                    self._manejar_recomendaciones()
+                elif opcion == '4':
                     self._manejar_edicion_perfil() # Nueva opción Tarea 1
                 elif opcion == '3':
                     self.vista.mostrar_mensaje("Cerrando sesion de estudiante.")
@@ -70,6 +76,7 @@ class ControladorEstudiante:
         
         if not all(datos):
             self.vista.mostrar_mensaje("Todos los campos son obligatorios.")
+            self.vista.mostrar_mensaje("Todos los campos son obligatorios.")
             self.vista.mostrar_mensaje("❌ Todos los campos son obligatorios.")
             return
 
@@ -78,6 +85,7 @@ class ControladorEstudiante:
         gesto_detectado = detectar_pulgar_arriba()
         
         if not gesto_detectado:
+            self.vista.mostrar_mensaje("Gesto de Pulgar Arriba no detectado. Registro cancelado.")
             self.vista.mostrar_mensaje("Gesto de Pulgar Arriba no detectado. Registro cancelado.")
             self.vista.mostrar_mensaje("❌ Gesto de Pulgar Arriba no detectado. Registro cancelado.")
             return
@@ -103,6 +111,16 @@ class ControladorEstudiante:
         
         self.vista.mostrar_mensaje(mensaje)
 
+    def _manejar_recomendaciones(self):
+        self.vista.mostrar_mensaje("\n--- PROFESORES RECOMENDADOS (POR POPULARIDAD) ---")
+        recomendaciones = self.modelo_votacion.obtener_profesores_recomendados()
+        
+        if not recomendaciones:
+            self.vista.mostrar_mensaje("Aun no hay suficientes datos para mostrar recomendaciones.")
+            return
+            
+        self.vista.mostrar_recomendaciones(recomendaciones)
+
     # Nuevo método auxiliar para obtener el ID de estudiante a partir del user_id logueado
     def _obtener_id_estudiante_por_user_id(self, user_id):
         conexion = obtener_conexion_db()
@@ -123,6 +141,7 @@ class ControladorEstudiante:
         return resultado[0] if resultado else None
 
 
+            self.vista.mostrar_mensaje(f" {mensaje}")
             self.vista.mostrar_mensaje(f"✅ {mensaje}")
         else:
             self.vista.mostrar_mensaje(f"{mensaje}")
@@ -183,12 +202,18 @@ class ControladorEstudiante:
         matricula_o_id, id_profesor = self.vista.obtener_datos_voto()
 
         if not matricula_o_id or not id_profesor:
+            self.vista.mostrar_mensaje("Debes ingresar tu matrícula y el ID del profesor.")
             self.vista.mostrar_mensaje("❌ Debes ingresar tu matrícula y el ID del profesor.")
             return
 
         id_estudiante_db = self._obtener_id_estudiante_por_matricula(matricula_o_id)
         
         if id_estudiante_db is None:
+            self.vista.mostrar_mensaje(f"Error: La matrícula o ID '{matricula_o_id}' no está registrada como estudiante.")
+            return
+            
+        if self.modelo_votacion.verificar_voto_estudiante(id_estudiante_db):
+            self.vista.mostrar_mensaje(f"Lo siento, el estudiante con matrícula '{matricula_o_id}' ya ha votado.")
             self.vista.mostrar_mensaje(f"❌ Error: La matrícula o ID '{matricula_o_id}' no está registrada como estudiante.")
             return
             
@@ -203,6 +228,12 @@ class ControladorEstudiante:
 
         success, mensaje = self.modelo_votacion.registrar_voto(id_estudiante_db, id_profesor)
         self.vista.mostrar_mensaje(f"\n{mensaje}")
+            self.vista.mostrar_mensaje("ID de profesor no válido. Intenta de nuevo.")
+            return
+
+        success, mensaje = self.modelo_votacion.registrar_voto(id_estudiante_db, id_profesor)
+        self.vista.mostrar_mensaje(f"\n{'' if success else ''} {mensaje}")
+
             self.vista.mostrar_mensaje("❌ ID de profesor no válido. Intenta de nuevo.")
             return
 

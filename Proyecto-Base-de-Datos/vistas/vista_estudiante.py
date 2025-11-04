@@ -12,6 +12,9 @@ class VistaEstudiante:
         else:
             print("\n*** MENÚ DE ESTUDIANTE LOGUEADO ***")
             print("1. Votar por un profesor")
+            print("2. Ver/Editar mi Perfil")
+            print("3. Ver Recomendaciones de Profesores")
+            print("4. Cerrar Sesion")
             print("2. Ver/Editar mi Perfil") # Nueva opción Tarea 1
             print("3. Cerrar Sesion")
             opcion = input("Selecciona una opcion: ").strip()
@@ -111,4 +114,17 @@ class VistaEstudiante:
     def solicitar_confirmacion_gesto(self):
         confirmacion = input("Presiona ENTER para iniciar la deteccion del gesto con la camara...").strip()
         confirmacion = input("Presiona ENTER para iniciar la detección del gesto con la cámara...").strip()
+        return confirmacion
+    
+    def mostrar_recomendaciones(self, recomendaciones):
+        print(f"{'VOTOS':<8}{'PROFESOR':<30}{'DEPARTAMENTO':<20}")
+        print("-" * 58)
+        
+        for r in recomendaciones:
+            votos = r.get('total_votos', 0)
+            print(f"{votos:<8}{r['nombre']:<30}{r['departamento']:<20}")
+            
+        print("-" * 58)
+        if not recomendaciones:
+            print("No hay profesores para recomendar en este momento.")
         return confirmacion

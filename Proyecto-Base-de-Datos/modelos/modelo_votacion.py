@@ -54,6 +54,7 @@ class ModeloVotacion:
             mensaje_error = f"Error al registrar voto: {e}"
             if e.errno == 1062:
                 mensaje_error = "Ya existe un voto registrado para este estudiante."
+                mensaje_error = "Ya existe un voto registrado para este estudiante."
                 mensaje_error = "❌ Ya existe un voto registrado para este estudiante."
             return False, mensaje_error
             
@@ -100,6 +101,36 @@ class ModeloVotacion:
             cnx.rollback()
             return False, f"Error de MySQL al ejecutar la baja: {e}"
 
+    def obtener_profesores_recomendados(self):
+        cnx = self._obtener_conexion()
+        if not cnx:
+            return []
+        
+        cursor = cnx.cursor(dictionary=True)
+        try:
+            consulta = """
+                SELECT 
+                    p.nombre, 
+                    p.departamento, 
+                    COUNT(v.profesor_id) AS total_votos
+                FROM profesores p
+                LEFT JOIN votos v ON p.id = v.profesor_id
+                GROUP BY p.id, p.nombre, p.departamento
+                ORDER BY total_votos DESC, p.nombre;
+            """
+            cursor.execute(consulta)
+            resultados = cursor.fetchall()
+            return resultados
+            
+        except mysql.connector.Error as e:
+            print(f"Error al obtener recomendaciones: {e}")
+            return []
+        
+        finally:
+            if cursor:
+                cursor.close()
+            if cnx and cnx.is_connected():
+                cnx.close()
 
     def obtener_resultados(self):
         cnx = self._obtener_conexion()
@@ -125,6 +156,7 @@ class ModeloVotacion:
 
         except mysql.connector.Error as e:
             print(f"Error al obtener resultados de votacion: {e}")
+            print(f"Error al obtener resultados de votación: {e}")
             print(f"❌ Error al obtener resultados de votación: {e}")
             return [], 0
             
