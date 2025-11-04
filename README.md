@@ -1,9 +1,9 @@
-# ProyectoBDD-VLYNÇ
+# ProyectoBDD-VLYN
 
-Lautaro Riquelme Nicolas
+Lautaro Riquelme Nicolas.
 
-Joaquin Elias Limaco Rodriguez
+Joaquin Elias Limaco Rodriguez.
 
-Yair Ariel Villca Juaniquina
+Yair Ariel Villca Juaniquina.
 
-Victor Santiago Exequiel Jara
+Victor Santiago Exequiel Jara.

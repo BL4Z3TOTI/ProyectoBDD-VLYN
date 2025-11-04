@@ -55,6 +55,7 @@ class ModeloVotacion:
             if e.errno == 1062:
                 mensaje_error = "Ya existe un voto registrado para este estudiante."
                 mensaje_error = "Ya existe un voto registrado para este estudiante."
+                mensaje_error = "❌ Ya existe un voto registrado para este estudiante."
             return False, mensaje_error
             
         finally:
@@ -156,6 +157,7 @@ class ModeloVotacion:
         except mysql.connector.Error as e:
             print(f"Error al obtener resultados de votacion: {e}")
             print(f"Error al obtener resultados de votación: {e}")
+            print(f"❌ Error al obtener resultados de votación: {e}")
             return [], 0
             
         finally:

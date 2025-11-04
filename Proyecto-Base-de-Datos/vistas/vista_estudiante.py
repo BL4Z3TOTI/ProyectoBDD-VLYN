@@ -1,5 +1,6 @@
 class VistaEstudiante:
     
+    # TAREA 1: Adaptar menu para login
     def mostrar_menu_estudiante(self, logueado=False):
         if not logueado:
             print("\n*** MENÚ DE ESTUDIANTE (PRE-LOGIN) ***")
@@ -14,6 +15,8 @@ class VistaEstudiante:
             print("2. Ver/Editar mi Perfil")
             print("3. Ver Recomendaciones de Profesores")
             print("4. Cerrar Sesion")
+            print("2. Ver/Editar mi Perfil") # Nueva opción Tarea 1
+            print("3. Cerrar Sesion")
             opcion = input("Selecciona una opcion: ").strip()
             return opcion
 
@@ -57,6 +60,7 @@ class VistaEstudiante:
             print(f"[{id:<3}] {nombre:<30}{departamento:<20}")
         print("-" * 55)
 
+    # TAREA 1: Nuevo metodo para obtener datos de edicion de perfil
     def obtener_nuevos_datos_perfil(self):
         print("\n--- INGRESA LOS NUEVOS VALORES (deja vacio para no cambiar) ---")
         
@@ -88,6 +92,7 @@ class VistaEstudiante:
             
         return nuevos_datos
 
+    # Modificado para el flujo de login (Ya no pide matricula)
     def obtener_id_profesor_voto(self):
         print("\n--- EMITIR VOTO ---")
     def obtener_datos_voto(self):
@@ -100,6 +105,7 @@ class VistaEstudiante:
             
         return id_profesor
         
+    # Removida funcion obtener_datos_voto del archivo original, ya que fue reemplazada.
         return id_estudiante_o_matricula, id_profesor
         
     def mostrar_mensaje(self, mensaje):
@@ -121,3 +127,4 @@ class VistaEstudiante:
         print("-" * 58)
         if not recomendaciones:
             print("No hay profesores para recomendar en este momento.")
+        return confirmacion
