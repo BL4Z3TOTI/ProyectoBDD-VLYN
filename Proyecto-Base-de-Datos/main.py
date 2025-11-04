@@ -1,3 +1,4 @@
+
 from modelos.iniciar_tablas import IniciarTablas
 from controlador.controlador_administrador import ControladorAdministrador
 from controlador.controlador_estudiante import ControladorEstudiante
@@ -14,6 +15,14 @@ def mostrar_menu_principal():
     print("2. Registrar nuevo estudiante")
     print("3. Salir")
     opcion = input("Selecciona una opcion: ").strip()
+
+def mostrar_menu_principal():
+    print("=== PROYECTO BASE DE DATOS ===")
+    print("1. Menú Estudiante (Registro y Votación)")
+    print("2. Menú Profesor (Consultar Votantes)")
+    print("3. Menú Administrador")
+    print("4. Salir")
+    opcion = input("Selecciona una opción: ").strip()
     return opcion
 
 if __name__ == "__main__":
@@ -25,6 +34,9 @@ if __name__ == "__main__":
     print("Inicializacion de DB completada. Iniciando menu interactivo...")
 
     # 2. Bucle principal para manejar el LOGIN/REGISTRO
+    iniciador = IniciarTablas()
+    iniciador.inicializar_tablas()
+
     while True:
         opcion = mostrar_menu_principal()
 
@@ -59,3 +71,16 @@ if __name__ == "__main__":
             break
         else:
             print("Opcion no valida. Intenta de nuevo.")
+            controlador_estudiante = ControladorEstudiante()
+            controlador_estudiante.iniciar_menu()
+        elif opcion == '2':
+            controlador_profesor = ControladorProfesor()
+            controlador_profesor.iniciar_consulta()
+        elif opcion == '3':
+            controlador_admin = ControladorAdministrador()
+            controlador_admin.iniciar_menu()
+        elif opcion == '4':
+            print("Cerrando la aplicación. ¡Hasta pronto! 👋")
+            break
+        else:
+            print("Opción no válida. Intenta de nuevo.")

@@ -1,3 +1,4 @@
+
 from vistas.vista_administrador import VistaAdministrador
 from modelos.modelo_votacion import ModeloVotacion
 from config_BD import PIN_ADMIN_PRINCIPAL, PIN_ADMIN_VOTOS
@@ -11,6 +12,9 @@ class ControladorAdministrador:
         self.vista = VistaAdministrador()
         self.modelo_votacion = ModeloVotacion()
         self.user_id = user_id
+    def __init__(self):
+        self.vista = VistaAdministrador()
+        self.modelo_votacion = ModeloVotacion()
 
     def iniciar_menu(self):
         pin = self.vista.solicitar_pin()
@@ -30,6 +34,12 @@ class ControladorAdministrador:
                 break
             else:
                 self.vista.mostrar_mensaje("Opcion no valida. Intenta de nuevo.")
+                self._manejar_baja_profesores()
+            elif opcion == '4':
+                self.vista.mostrar_mensaje("Saliendo del menú de administrador.")
+                break
+            else:
+                self.vista.mostrar_mensaje("Opción no válida. Intenta de nuevo.")
 
     def _obtener_estudiantes_y_profesores(self):
         conexion = obtener_conexion_db()
@@ -77,6 +87,11 @@ class ControladorAdministrador:
         
         if pin_votos != PIN_ADMIN_VOTOS:
             self.vista.mostrar_mensaje("PIN de resultados de votacion incorrecto.")
+            return
+
+        resultados, total_votos = self.modelo_votacion.obtener_resultados()
+        self.vista.mostrar_resultados_votacion(resultados, total_votos)
+            self.vista.mostrar_mensaje("❌ PIN de resultados de votación incorrecto.")
             return
 
         resultados, total_votos = self.modelo_votacion.obtener_resultados()

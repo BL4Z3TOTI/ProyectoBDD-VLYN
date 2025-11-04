@@ -1,3 +1,4 @@
+
 from vistas.vista_profesor import VistaProfesor
 from modelos.modelo_profesor import ModeloProfesor
 
@@ -8,6 +9,9 @@ class ControladorProfesor:
         self.vista = VistaProfesor()
         self.modelo_profesor = ModeloProfesor()
         self.user_id = user_id
+    def __init__(self):
+        self.vista = VistaProfesor()
+        self.modelo_profesor = ModeloProfesor()
 
     def iniciar_consulta(self):
         id_profesor = self.vista.solicitar_id_profesor()

@@ -1,3 +1,4 @@
+
 import mysql.connector
 from modelos.conexion_BD import obtener_conexion_db
 from config_BD import DB_HOST, DB_NAME, DB_USER, DB_PASSWORD
@@ -46,6 +47,15 @@ class ModeloUsuario:
                     mensaje_error = f"El email '{email}' ya está registrado."
                 else:
                     mensaje_error = "Error de registro. Datos duplicados."
+            if e.errno == 1062: # Error de duplicidad (UNIQUE constraint))
+                if 'username' in str(e):
+                    mensaje_error = f"❌ El nombre de usuario '{username}' ya está en uso."
+                elif 'matricula' in str(e):
+                    mensaje_error = f"❌ La matrícula '{matricula}' ya está registrada."
+                elif 'email' in str(e):
+                    mensaje_error = f"❌ El email '{email}' ya está registrado."
+                else:
+                    mensaje_error = "❌ Error de registro. Datos duplicados."
             
             if usuario_id:
                 try:
@@ -130,3 +140,4 @@ class ModeloUsuario:
         cursor.close()
         cnx.close()
         return True, "Datos actualizados con exito."
+                cnx.close()
