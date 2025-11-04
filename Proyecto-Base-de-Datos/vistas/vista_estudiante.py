@@ -1,6 +1,6 @@
 class VistaEstudiante:
     
-    # TAREA 1: Adaptar menu para login
+    # TAREA 1: Adaptar menu para login (Limpio)
     def mostrar_menu_estudiante(self, logueado=False):
         if not logueado:
             print("\n*** MENÚ DE ESTUDIANTE (PRE-LOGIN) ***")
@@ -15,30 +15,25 @@ class VistaEstudiante:
             print("2. Ver/Editar mi Perfil")
             print("3. Ver Recomendaciones de Profesores")
             print("4. Cerrar Sesion")
-            print("2. Ver/Editar mi Perfil") # Nueva opción Tarea 1
-            print("3. Cerrar Sesion")
             opcion = input("Selecciona una opcion: ").strip()
             return opcion
-
-
-class VistaEstudiante:
-    
-    def mostrar_menu_estudiante(self):
-        print("\n*** MENÚ DE ESTUDIANTE ***")
-        print("1. Registrar nuevo estudiante")
-        print("2. Votar por un profesor")
-        print("3. Salir al Menú Principal")
-        opcion = input("Selecciona una opción: ").strip()
+            
+    # TAREA 4: Nuevo método para solicitar el tipo de login
+    def solicitar_tipo_login(self):
+        print("\n--- INICIO DE SESIÓN ESTUDIANTE ---")
+        print("1. Acceder con Nombre de Usuario y Contraseña")
+        print("2. Acceder con Gesto de Pulgar (Biométrico)")
+        opcion = input("Selecciona una opcion: ").strip()
         return opcion
+        
+    # TAREA 4: Nuevo método para solicitar la matrícula
+    def solicitar_matricula(self):
+        return input("Ingresa tu Matrícula para el acceso biométrico: ").strip()
 
     def obtener_datos_registro(self):
         print("\n--- REGISTRO DE ESTUDIANTE ---")
         nombre = input("Nombre: ").strip()
         apellido = input("Apellido: ").strip()
-        matricula = input("Matricula: ").strip()
-        email = input("Email: ").strip()
-        username = input("Usuario: ").strip()
-        password = input("Contrasena: ").strip()
         matricula = input("Matrícula: ").strip()
         email = input("Email: ").strip()
         username = input("Usuario: ").strip()
@@ -48,7 +43,6 @@ class VistaEstudiante:
         return datos
 
     def mostrar_profesores(self, profesores):
-        print("\n--- PROFESORES DISPONIBLES PARA VOTACION ---")
         print("\n--- PROFESORES DISPONIBLES PARA VOTACIÓN ---")
         if not profesores:
             print("No hay profesores registrados para votar.")
@@ -60,7 +54,6 @@ class VistaEstudiante:
             print(f"[{id:<3}] {nombre:<30}{departamento:<20}")
         print("-" * 55)
 
-    # TAREA 1: Nuevo metodo para obtener datos de edicion de perfil
     def obtener_nuevos_datos_perfil(self):
         print("\n--- INGRESA LOS NUEVOS VALORES (deja vacio para no cambiar) ---")
         
@@ -92,12 +85,8 @@ class VistaEstudiante:
             
         return nuevos_datos
 
-    # Modificado para el flujo de login (Ya no pide matricula)
     def obtener_id_profesor_voto(self):
         print("\n--- EMITIR VOTO ---")
-    def obtener_datos_voto(self):
-        print("\n--- EMITIR VOTO ---")
-        id_estudiante_o_matricula = input("Ingresa tu Matrícula (o ID): ").strip()
         try:
             id_profesor = int(input("Ingresa el ID del profesor a votar: ").strip())
         except ValueError:
@@ -105,17 +94,12 @@ class VistaEstudiante:
             
         return id_profesor
         
-    # Removida funcion obtener_datos_voto del archivo original, ya que fue reemplazada.
-        return id_estudiante_o_matricula, id_profesor
-        
     def mostrar_mensaje(self, mensaje):
         print(mensaje)
         
     def solicitar_confirmacion_gesto(self):
-        confirmacion = input("Presiona ENTER para iniciar la deteccion del gesto con la camara...").strip()
-        confirmacion = input("Presiona ENTER para iniciar la detección del gesto con la cámara...").strip()
-        return confirmacion
-    
+        input("Presiona ENTER para iniciar la detección del gesto con la cámara...")
+        
     def mostrar_recomendaciones(self, recomendaciones):
         print(f"{'VOTOS':<8}{'PROFESOR':<30}{'DEPARTAMENTO':<20}")
         print("-" * 58)
@@ -127,4 +111,3 @@ class VistaEstudiante:
         print("-" * 58)
         if not recomendaciones:
             print("No hay profesores para recomendar en este momento.")
-        return confirmacion
