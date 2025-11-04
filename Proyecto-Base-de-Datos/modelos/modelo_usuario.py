@@ -38,6 +38,15 @@ class ModeloUsuario:
 
         except mysql.connector.Error as e:
             mensaje_error = "Error desconocido de MySQL. Revisa los logs."
+            if e.errno == 1062:
+                if 'username' in str(e):
+                    mensaje_error = f"El nombre de usuario '{username}' ya está en uso."
+                elif 'matricula' in str(e):
+                    mensaje_error = f"La matrícula '{matricula}' ya está registrada."
+                elif 'email' in str(e):
+                    mensaje_error = f"El email '{email}' ya está registrado."
+                else:
+                    mensaje_error = "Error de registro. Datos duplicados."
             if e.errno == 1062: # Error de duplicidad (UNIQUE constraint))
                 if 'username' in str(e):
                     mensaje_error = f"❌ El nombre de usuario '{username}' ya está en uso."
@@ -61,4 +70,74 @@ class ModeloUsuario:
             if cursor:
                 cursor.close()
             if cnx and cnx.is_connected():
+                cnx.close()
+    
+    # TAREA 1: NUEVOS MÉTODOS
+    def iniciar_sesion(self, username, password_plana):
+        cnx = self._obtener_conexion()
+        if not cnx:
+            return None, None, "Error de conexion a la base de datos."
+
+        cursor = cnx.cursor(dictionary=True)
+        
+        sql = "SELECT id, password_hash, rol FROM usuarios WHERE username = %s"
+        cursor.execute(sql, (username,))
+        usuario = cursor.fetchone()
+
+        if usuario and usuario['password_hash'] == password_plana:
+            cursor.close()
+            cnx.close()
+            return usuario['id'], usuario['rol'], "Inicio de sesion exitoso."
+        elif usuario:
+            cursor.close()
+            cnx.close()
+            return None, None, "Contrasena incorrecta."
+        else:
+            cursor.close()
+            cnx.close()
+            return None, None, f"Usuario '{username}' no encontrado."
+            
+    def actualizar_datos(self, usuario_id, rol, datos_perfil):
+        cnx = self._obtener_conexion()
+        if not cnx:
+            return False, "Error de conexion a la base de datos."
+
+        cursor = cnx.cursor()
+        
+        updates = []
+        data = []
+        
+        if 'username' in datos_perfil:
+            updates.append("username = %s")
+            data.append(datos_perfil['username'])
+        if 'password' in datos_perfil:
+            updates.append("password_hash = %s")
+            data.append(datos_perfil['password'])
+
+        if updates:
+            sql_user = f"UPDATE usuarios SET {', '.join(updates)} WHERE id = %s"
+            data.append(usuario_id)
+            cursor.execute(sql_user, tuple(data))
+        
+        if rol == 'Estudiante':
+            cursor.execute("SELECT id FROM estudiantes WHERE usuario_id = %s", (usuario_id,))
+            e_id_result = cursor.fetchone()
+            
+            if e_id_result:
+                e_id = e_id_result[0]
+                sql_est = "UPDATE estudiantes SET nombre=%s, apellido=%s, matricula=%s, email=%s WHERE id=%s"
+                
+                datos_update = (
+                    datos_perfil.get('nombre', None),
+                    datos_perfil.get('apellido', None),
+                    datos_perfil.get('matricula', None),
+                    datos_perfil.get('email', None),
+                    e_id
+                )
+                cursor.execute(sql_est, datos_update)
+        
+        cnx.commit()
+        cursor.close()
+        cnx.close()
+        return True, "Datos actualizados con exito."
                 cnx.close()
