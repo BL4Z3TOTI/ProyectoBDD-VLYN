@@ -1,0 +1,24 @@
+FROM python:3.9-slim
+
+# Instala dependencias del sistema necesarias para OpenCV y Mediapipe
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instala las librerías de Python con binarios precompilados
+RUN pip install --no-cache-dir \
+    mysql-connector-python \
+    opencv-python \
+    mediapipe
+
+# Directorio de trabajo
+WORKDIR /app
+
+# Copia tu código (ajustá según tu estructura)
+COPY . .
+
+# Mantiene el contenedor corriendo (para debug o pruebas)
+CMD ["tail", "-f", "/dev/null"]
+
+
