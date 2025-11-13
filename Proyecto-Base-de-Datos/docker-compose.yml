@@ -10,31 +10,20 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: pass
     ports:
-      - "3306:3306"
-    volumes:
-      - ./data:/var/lib/mysql
-
-  phpmyadmin:
-    image: phpmyadmin
-    restart: always
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: mysql
-      PMA_USER: user
-      PMA_PASSWORD: pass
+      - "3307:3306"
 
   python-app:
     build: ./python
     container_name: python_client
     depends_on:
       - mysql
+    privileged: true 
     volumes:
       - ./app:/app
-      - /tmp/.X11-unix:/tmp/.X11-unix   # 👈 para acceder al servidor gráfico (X11)
-      - /dev/video0:/dev/video0         # 👈 acceso directo a la cámara del host
+      - /tmp/.X11-unix:/tmp/.X11-unix   
+      - /dev/video0:/dev/video0        
     environment:
-      - DISPLAY=${DISPLAY}              # 👈 para permitir mostrar ventanas (cv2.imshow)
+      - DISPLAY=${DISPLAY}            
     working_dir: /app
     stdin_open: true
     tty: true
