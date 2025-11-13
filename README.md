@@ -2,11 +2,13 @@
 
 
 
-Para probarlo:
-   primera vez
+Para probarlo, entrar a la carpeta Proyecto-Base-De-Datos: 
+
+   La primera vez, ejecutar el comando 
  
       docker compose up --build -d
 
+   (tarda un rato)
    el comando --build es para buildear desde cero la imagen, siguientes corridas no debería estar
    el comando -d es para que pueda salir de la terminal y no quedarse corriendo (modo detached)
 
