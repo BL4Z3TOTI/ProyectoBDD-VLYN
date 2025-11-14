@@ -2,6 +2,7 @@
 import cv2
 import mediapipe as mp
 
+
 mp_hands = mp.solutions.hands
 
 def detectar_pulgar_arriba():

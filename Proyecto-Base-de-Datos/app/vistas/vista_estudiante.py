@@ -20,27 +20,44 @@ class VistaEstudiante:
             
     # TAREA 4: Nuevo método para solicitar el tipo de login
     def solicitar_tipo_login(self):
+        print("\n"*80)
         print("\n--- INICIO DE SESIÓN ESTUDIANTE ---")
         print("1. Acceder con Nombre de Usuario y Contraseña")
         print("2. Acceder con Gesto de Pulgar (Biométrico)")
         opcion = input("Selecciona una opcion: ").strip()
         return opcion
-        
-    # TAREA 4: Nuevo método para solicitar la matrícula
-    def solicitar_matricula(self):
-        return input("Ingresa tu Matrícula para el acceso biométrico: ").strip()
 
     def obtener_datos_registro(self):
         print("\n--- REGISTRO DE ESTUDIANTE ---")
         nombre = input("Nombre: ").strip()
         apellido = input("Apellido: ").strip()
-        matricula = input("Matrícula: ").strip()
         email = input("Email: ").strip()
         username = input("Usuario: ").strip()
         password = input("Contraseña: ").strip()
         
         datos = (nombre, apellido, matricula, email, username, password)
         return datos
+
+
+    def obtener_datos_estudiante(self):
+        print("\n--- REGISTRO DE ESTUDIANTE ---")
+        matricula = input("Matricula: ").strip()
+        
+        datos = ( matricula)
+        return datos
+
+    def obtener_datos_estudiante(self):
+        print("\n--- REGISTRO DE PROFESOR ---")
+        departamento = input("Departamento: ").strip()
+        
+        datos = ( departamento)
+        return datos
+        
+    # TAREA 4: Nuevo método para solicitar la matrícula
+    def solicitar_matricula(self):
+        return input("Ingresa tu Matrícula para el acceso biométrico: ").strip()
+
+
 
     def mostrar_profesores(self, profesores):
         print("\n--- PROFESORES DISPONIBLES PARA VOTACIÓN ---")

@@ -9,9 +9,16 @@ class ControladorProfesor:
         self.vista = VistaProfesor()
         self.modelo_profesor = ModeloProfesor()
         self.user_id = user_id
-    def __init__(self):
-        self.vista = VistaProfesor()
-        self.modelo_profesor = ModeloProfesor()
+
+    def iniciar_login_profesor(self, parameter_list):
+
+        # Este método es llamado por main.py, por eso devuelve el resultado del login
+        self.user_id = None # Asegura que no arrastra un login previo
+        
+        opcion = self.vista.solicitar_tipo_login()
+        pass
+
+    
 
     def iniciar_consulta(self):
         id_profesor = self.vista.solicitar_id_profesor()

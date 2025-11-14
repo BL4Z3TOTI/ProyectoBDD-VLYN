@@ -4,8 +4,10 @@ from modelos.modelo_profesor import ModeloProfesor
 from modelos.modelo_votacion import ModeloVotacion
 from modelos.conexion_BD import obtener_conexion_db
 from DetectarPulgar import detectar_pulgar_arriba
- 
+from controlador_biometrico import ControladorBiometrico
 import mysql.connector
+import time
+
 
 class ControladorEstudiante:
     
@@ -15,6 +17,7 @@ class ControladorEstudiante:
         self.modelo_usuario = ModeloUsuario()
         self.modelo_profesor = ModeloProfesor()
         self.modelo_votacion = ModeloVotacion()
+        self.controladorBiometrico = ControladorBiometrico()
         self.user_id = user_id 
         self.rol = 'Estudiante'
 
@@ -22,7 +25,7 @@ class ControladorEstudiante:
     def _manejar_registro(self):
         # Lógica de registro existente (mantiene la validación con gesto)
         datos = self.vista.obtener_datos_registro()
-        nombre, apellido, matricula, email, username, password = datos
+        nombre, apellido, email, username, password = datos
         
         if not all(datos):
             self.vista.mostrar_mensaje("❌ Todos los campos son obligatorios.")
@@ -30,22 +33,44 @@ class ControladorEstudiante:
 
         gesto_detectado = detectar_pulgar_arriba()
         
-        if not gesto_detectado:
+        rol = ""
+        datosProfesor = None
+        datosEstudiante = None
+
+        if gesto_detectado:
+            rol="profes"
             datosProfesor = self.vista.obtener_datos_profesor()
             if not all(datosProfesor):
-                self.vista.mostrar_mensaje("x Todos los campos son obligatorios")
+                self.vista.mostrar_mensaje("❌ Todos los campos son obligatorios")
                 return
+        else:
+            rol = "estudiantes"
+            datosEstudiante = self.vista.obtener_datos_estudiante()
+            if not all(datosEstudiante):
+                self.vista.mostrar_mensaje("❌ Todos los campos son obligatorios")
+                return
+        
+        print("****************************")
+        print("Se le tomarán los datos biometricos, siga las instrucciones")
+        print("Saque las fotos de su rostro de manera enfocada y con buena iluminacion")
+        print("Saque las fotos apretando la tecla espacio")
+        print("Saque por lo menos 6 fotos")
+        print("Para terminar presione escape")
+        print("****************************")
+        time.sleep(0.5)
+
+        self.controladorBiometrico.registrarParametrosBiometricos(rol, username)
 
         datosGenerales = (username, nombre, apellido, matricula, email, gesto_detectado)
-
-            
-        success, mensaje = self.modelo_usuario.registrar_estudiante(datosGenerales, password)
+    
+        success, mensaje = self.modelo_usuario
+                                .registrar_usuario(datosGenerales, datosEstudiante, datosProfesor)
         
         self.vista.mostrar_mensaje(f"{mensaje}")
 
 
     def iniciar_menu(self):
-        # Flujo de POST-LOGIN (Votar y Perfil - Limpio)
+        # Flujo de POST-LOGIN (Votar y Perfil - Limpio)❌
         while True:
             opcion = self.vista.mostrar_menu_estudiante(logueado=True)
             
@@ -76,60 +101,25 @@ class ControladorEstudiante:
             
         elif opcion == '2':
             # Acceso Biométrico por Gesto y Matrícula (TAREA 4)
-            matricula = self.vista.solicitar_matricula()
-            
-            if not matricula:
-                return None, None, "Acceso cancelado. Debe ingresar su matrícula."
-                
-            user_id, rol, mensaje = self._obtener_usuario_por_matricula(matricula)
-            self.vista.mostrar_mensaje(mensaje)
-            
-            if user_id and rol == 'Estudiante':
-                
-                self.vista.solicitar_confirmacion_gesto() 
-                gesto_detectado = detectar_pulgar_arriba()
-                
-                if gesto_detectado:
-                    return user_id, rol, "✅ Inicio de sesión biométrico exitoso."
-                else:
-                    return None, None, "❌ Gesto de Pulgar Arriba no detectado. Inicio de sesión fallido."
+
+            print("Se le abrirá la cámara para los datos biométricos")
+            print("Saque la fotos de su rostro de manera enfocada y con buena iluminacion")
+            print("Saque la foto apretando la tecla espacio")
+            print("Para terminar presione escape")
+            print("****************************")
+            time.sleep(0.5)
+
+            username = self.controladorBiometrico.reconocerRostro("estudiantes")
+          
+                           
+            if username:
+                return self.modelo_usuario.obtener_usuario(username)
             else:
                 return None, None, "❌ Matrícula no corresponde a un Estudiante o no fue encontrada."
         
         else:
             return None, None, "Opción no válida. Volviendo al menú principal."
             
-    # TAREA 4: Método auxiliar para obtener user_id y rol a partir de la matrícula
-    def _obtener_usuario_por_matricula(self, matricula):
-        conexion = obtener_conexion_db()
-        if not conexion: 
-            return None, None, "Error de conexión a la base de datos."
-        
-        cursor = conexion.cursor(dictionary=True)
-        
-        try:
-            consulta = """
-            SELECT u.id AS user_id, u.rol 
-            FROM estudiantes e
-            JOIN usuarios u ON e.usuario_id = u.id
-            WHERE e.matricula = %s
-            """
-            cursor.execute(consulta, (matricula,))
-            resultado = cursor.fetchone()
-            
-            if resultado:
-                return resultado['user_id'], resultado['rol'], "Matrícula encontrada. Procediendo a la detección del gesto."
-            else:
-                return None, None, f"❌ Matrícula '{matricula}' no encontrada."
-        
-        except mysql.connector.Error as e:
-            return None, None, f"Error de base de datos: {e}"
-            
-        finally:
-            if cursor:
-                cursor.close()
-            if conexion and conexion.is_connected():
-                conexion.close()
                 
 
 

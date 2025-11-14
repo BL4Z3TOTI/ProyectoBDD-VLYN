@@ -2,13 +2,15 @@ import pandas as pd
 from deepface import DeepFace
 
 # Imagen a identificar
-img = "messiPrueba.png"
+img = "pruebaMessi.jpg"
 
 # Base de datos de rostros
 db = "_pruebaFotos/"
 
 # Buscar coincidencias
-resultados = DeepFace.find(img_path=img, db_path=db, model_name="ArcFace",     enforce_detection=False )
+resultados = DeepFace.find(img_path=img, db_path=db, model_name="ArcFace",     
+                detector_backend="mediapipe"
+                enforce_detection=False )
 
 # result es una lista → tomamos el primer DataFrame
 df = resultados[0]

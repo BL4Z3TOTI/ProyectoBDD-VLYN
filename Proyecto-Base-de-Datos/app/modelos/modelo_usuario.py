@@ -8,12 +8,12 @@ class ModeloUsuario:
     def _obtener_conexion(self):
         return obtener_conexion_db()
 
-    def registrar_estudiante(self, datos_estudiante, contrasena):
+    def registrar_usuario(self, datos_usuario, datos_estudiante, datos_profesor):
         cnx = self._obtener_conexion()
         if not cnx: 
             return False, "Error de conexión a la base de datos."
         
-        username, nombre, apellido, matricula, email, gesto_detectado = datos_estudiante
+        username, nombre, apellido, email, gesto_detectado = datos_usuario
         
         contrasena_plana = contrasena 
         
@@ -21,38 +21,37 @@ class ModeloUsuario:
         cursor = cnx.cursor()
 
         try:
-            sql_usuario = "INSERT INTO usuarios (username, password_hash, rol) VALUES (%s, %s, %s)"
-            cursor.execute(sql_usuario, (username, contrasena_plana, 'Estudiante'))
+            # Insertar usuario
+            rol = "Estudiante" if gesto_detectado else "Profesor"
+            sql_usuario = "INSERT INTO usuarios"+
+                          " (username, password_hash, rol, email, nombre, apellido) "+
+                          " VALUES (%s, %s, %s, %s , %s, %s)"
+            datos_usuario = (username, contrasena_plana, rol, email, nombre, apellido)
+            cursor.execute(sql_usuario, datos_usuario )
             usuario_id = cursor.lastrowid
             
 
-            if(gesto_detectado):
-                sql_estudiante = """   INSERT INTO estudiantes (usuario_id, matricula, nombre, apellido, email) VALUES (%s, %s, %s, %s, %s)"""
-                datos_insert_estudiante = (usuario_id, matricula, nombre, apellido, email)
+            if(not gesto_detectado):
+                matricula = datos_estudiante
+
+                sql_estudiante = """   INSERT INTO estudiantes 
+                                      (usuario_id, matricula) VALUES (%s, %s)"""
+                datos_insert_estudiante = (usuario_id,  matricula)
                 cursor.execute(sql_estudiante, datos_insert_estudiante)
                 cnx.commit()
                 return True, f"Estudiante '{nombre} {apellido}' registrado con éxito."
 
             else:
-                sql_profesor = """   INSERT INTO profesores (usuario_id, matricula, nombre, apellido, email) VALUES (%s, %s, %s, %s, %s)""" 
-                datos_insert_estudiante = (usuario_id, matricula, nombre, apellido, email)
-                cursor.execute(sql_estudiante, datos_insert_estudiante)
+                departamento = datos_profesor
+                sql_profesor = """   INSERT INTO profesores 
+                                     (usuario_id, departamento) VALUES (%s, %s)""" 
+                datos_insert_profesor = (usuario_id, departamento)
+                cursor.execute(sql_profesor, datos_insert_profesor)
                 cnx.commit()
                 return True, f"Profesor '{nombre} {apellido}' registrado con éxito."
 
         except mysql.connector.Error as e:
             mensaje_error = "Error desconocido de MySQL. Revisa los logs."
-            if e.errno == 1062:
-                if 'username' in str(e):
-            self.vista.mostrar_mensaje("❌ Gesto de Pulgar Arriba no detectado. Registro cancelado.")
-            return
-                    mensaje_error = f"El nombre de usuario '{username}' ya está en uso."
-                elif 'matricula' in str(e):
-                    mensaje_error = f"La matrícula '{matricula}' ya está registrada."
-                elif 'email' in str(e):
-                    mensaje_error = f"El email '{email}' ya está registrado."
-                else:
-                    mensaje_error = "Error de registro. Datos duplicados."
             if e.errno == 1062: # Error de duplicidad (UNIQUE constraint))
                 if 'username' in str(e):
                     mensaje_error = f"❌ El nombre de usuario '{username}' ya está en uso."
@@ -102,6 +101,28 @@ class ModeloUsuario:
             cursor.close()
             cnx.close()
             return None, None, f"Usuario '{username}' no encontrado."
+
+    def obtener_usuario(self, username, rol):
+
+        cnx = self._obtener_conexion()
+        if not cnx:
+            return None, None, "Error de conexion a la base de datos."
+
+        cursor = cnx.cursor(dictionary=True)
+        
+        sql = "SELECT id, nombre, rol FROM usuarios WHERE username = %s"
+        cursor.execute(sql, (username,))
+        usuario = cursor.fetchone()
+
+        if usuario:
+            cursor.close()
+            cnx.close()
+            return usuario['id'], usuario['rol'], "Inicio de sesion exitoso."
+        else:
+            cursor.close()
+            cnx.close()
+            return None, None, f"Usuario '{username}' no encontrado."
+
             
     def actualizar_datos(self, usuario_id, rol, datos_perfil):
         cnx = self._obtener_conexion()

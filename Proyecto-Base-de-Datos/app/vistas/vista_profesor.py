@@ -10,6 +10,15 @@ class VistaProfesor:
             self.mostrar_mensaje("Entrada no válida. El ID debe ser un número.")
             return None
 
+    # TAREA 4: Nuevo método para solicitar el tipo de login
+    def solicitar_tipo_login(self):
+        print("\n"*80)
+        print("\n--- INICIO DE SESIÓN PROFESOR ---")
+        print("1. Acceder con Nombre de Usuario y Contraseña")
+        print("2. Acceder con Gesto de Pulgar (Biométrico)")
+        opcion = input("Selecciona una opcion: ").strip()
+        return opcion
+
     def mostrar_votantes(self, votantes, nombre_profesor):
         
         print(f"\n--- ESTUDIANTES QUE VOTARON POR EL PROFESOR {nombre_profesor.upper()} ---")

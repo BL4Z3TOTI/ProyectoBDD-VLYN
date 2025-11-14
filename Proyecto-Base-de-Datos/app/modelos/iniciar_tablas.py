@@ -36,7 +36,6 @@ class IniciarTablas:
             CREATE TABLE IF NOT EXISTS profesores (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 usuario_id INT NOT NULL UNIQUE,
-                nombre VARCHAR(100) NOT NULL,      
                 departamento VARCHAR(100),         
                 FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
             );

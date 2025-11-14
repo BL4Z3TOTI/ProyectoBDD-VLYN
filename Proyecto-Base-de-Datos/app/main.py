@@ -11,7 +11,7 @@ def mostrar_menu_principal():
     print("=== PROYECTO BASE DE DATOS ===")
     print("==================================")
     print("1. Iniciar Sesion (Estudiante/Profesor/Admin)")
-    print("2. Registrar nuevo estudiante")
+    print("2. Registrar nuevo estudiante o profesor")
     print("3. Salir")
     opcion = input("Selecciona una opcion: ").strip()
     return opcion
@@ -22,12 +22,12 @@ if __name__ == "__main__":
     iniciador.inicializar_tablas()
 
     print("Inicializacion de DB completada. Iniciando menu interactivo...")
-
+    print("\n"*80)
     while True:
         opcion = mostrar_menu_principal()
 
         if opcion == '1':
-            print("\n"*80)
+            
             
             print("\n--- SELECCIÓN DE ROL ---")
             print("1. Estudiante")
@@ -40,9 +40,12 @@ if __name__ == "__main__":
             if opcion_rol == '1':
                 controlador_estudiante = ControladorEstudiante() 
                 user_id, rol, mensaje = controlador_estudiante.iniciar_login_estudiante() # Nuevo método
-                
-            elif opcion_rol in ('2', '3'):
-                rol_str = 'Profesor' if opcion_rol == '2' else 'Administrador'
+
+            elif opcion_rol == '2':
+                controlador_profesor = ControladorProfesor()
+                user_id, rol, mensaje = controlador_profesor.iniciar_login_profesor()    
+            elif opcion_rol ==  '3':
+                rol_str = 'Administrador'
                 username = input(f"Usuario ({rol_str}): ").strip()
                 password = input("Contrasena: ").strip()
                 
@@ -51,7 +54,8 @@ if __name__ == "__main__":
                 
                 if user_id and rol != rol_str:
                     user_id, rol, mensaje = None, None, f"Login fallido: El usuario '{username}' es de rol '{rol}', no '{rol_str}'."
-            
+            else:
+                user_id, rol, mensaje = None, None, "Opcion incorrecta"
             print(mensaje)
             
             if user_id and rol:
