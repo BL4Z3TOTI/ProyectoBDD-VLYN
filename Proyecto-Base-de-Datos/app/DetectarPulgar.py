@@ -6,11 +6,16 @@ mp_hands = mp.solutions.hands
 
 def detectar_pulgar_arriba():
     cap = cv2.VideoCapture(0)
+    # Configura resolución baja para mejor rendimiento
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_FPS, 20)
 
     PUNTAS_DEDOS = [8, 12, 16, 20]
     SEGUNDOS_NUDILLOS = [7, 11, 15, 19]
 
     with mp_hands.Hands(
+        model_complexity=0,
         max_num_hands=1,
         min_detection_confidence=0.7,
         min_tracking_confidence=0.7) as hands:

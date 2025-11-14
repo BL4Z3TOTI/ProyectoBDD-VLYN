@@ -15,15 +15,20 @@ services:
   python-app:
     build: ./python
     container_name: python_client
+    network_mode: "host"
     depends_on:
       - mysql
-    privileged: true 
+    privileged: true
+    devices: 
+      - "/dev/video0:/dev/video0"
+      - "/dev/video1:/dev/video1"
     volumes:
       - ./app:/app
+      - /dev:/dev
       - /tmp/.X11-unix:/tmp/.X11-unix   
-      - /dev/video0:/dev/video0        
     environment:
-      - DISPLAY=${DISPLAY}            
+      - DISPLAY=${DISPLAY}
+      - IP_WEBCAM_URL=http://192.168.0.36:8080/video  # Cambia por la IP de tu teléfono        
     working_dir: /app
     stdin_open: true
     tty: true
