@@ -8,8 +8,8 @@ img = "pruebaMessi.jpg"
 db = "_pruebaFotos/"
 
 # Buscar coincidencias
-resultados = DeepFace.find(img_path=img, db_path=db, model_name="ArcFace",     
-                detector_backend="mediapipe"
+resultados = DeepFace.find(img_path=img, db_path=db, model_name="SFace",     
+                detector_backend="mediapipe",
                 enforce_detection=False )
 
 # result es una lista → tomamos el primer DataFrame
