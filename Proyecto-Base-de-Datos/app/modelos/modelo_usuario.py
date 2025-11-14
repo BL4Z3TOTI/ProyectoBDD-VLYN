@@ -13,7 +13,7 @@ class ModeloUsuario:
         if not cnx: 
             return False, "Error de conexión a la base de datos."
         
-        username, nombre, apellido, matricula, email = datos_estudiante
+        username, nombre, apellido, matricula, email, gesto_detectado = datos_estudiante
         
         contrasena_plana = contrasena 
         
@@ -26,20 +26,26 @@ class ModeloUsuario:
             usuario_id = cursor.lastrowid
             
 
-            sql_estudiante = """
-            INSERT INTO estudiantes (usuario_id, matricula, nombre, apellido, email) 
-            VALUES (%s, %s, %s, %s, %s)
-            """
-            datos_insert_estudiante = (usuario_id, matricula, nombre, apellido, email)
-            cursor.execute(sql_estudiante, datos_insert_estudiante)
-            
-            cnx.commit()
-            return True, f"Estudiante '{nombre} {apellido}' registrado con éxito."
+            if(gesto_detectado):
+                sql_estudiante = """   INSERT INTO estudiantes (usuario_id, matricula, nombre, apellido, email) VALUES (%s, %s, %s, %s, %s)"""
+                datos_insert_estudiante = (usuario_id, matricula, nombre, apellido, email)
+                cursor.execute(sql_estudiante, datos_insert_estudiante)
+                cnx.commit()
+                return True, f"Estudiante '{nombre} {apellido}' registrado con éxito."
+
+            else:
+                sql_profesor = """   INSERT INTO profesores (usuario_id, matricula, nombre, apellido, email) VALUES (%s, %s, %s, %s, %s)""" 
+                datos_insert_estudiante = (usuario_id, matricula, nombre, apellido, email)
+                cursor.execute(sql_estudiante, datos_insert_estudiante)
+                cnx.commit()
+                return True, f"Profesor '{nombre} {apellido}' registrado con éxito."
 
         except mysql.connector.Error as e:
             mensaje_error = "Error desconocido de MySQL. Revisa los logs."
             if e.errno == 1062:
                 if 'username' in str(e):
+            self.vista.mostrar_mensaje("❌ Gesto de Pulgar Arriba no detectado. Registro cancelado.")
+            return
                     mensaje_error = f"El nombre de usuario '{username}' ya está en uso."
                 elif 'matricula' in str(e):
                     mensaje_error = f"La matrícula '{matricula}' ya está registrada."

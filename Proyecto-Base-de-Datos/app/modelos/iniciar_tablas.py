@@ -24,6 +24,9 @@ class IniciarTablas:
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 username VARCHAR(50) NOT NULL UNIQUE,
                 password_hash VARCHAR(255) NOT NULL,
+                nombre VARCHAR(100) NOT NULL,
+                apellido VARCHAR(100) NOT NULL,
+                email VARCHAR(100) UNIQUE,
                 rol VARCHAR(20) NOT NULL
             );
             """
@@ -54,9 +57,7 @@ class IniciarTablas:
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 usuario_id INT NOT NULL UNIQUE,
                 matricula VARCHAR(20) UNIQUE,
-                nombre VARCHAR(100) NOT NULL,
-                apellido VARCHAR(100) NOT NULL,
-                email VARCHAR(100) UNIQUE,
+
                 FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
             );
             """

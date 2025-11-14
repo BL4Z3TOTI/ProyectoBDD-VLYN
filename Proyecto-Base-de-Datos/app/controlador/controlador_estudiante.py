@@ -3,7 +3,8 @@ from modelos.modelo_usuario import ModeloUsuario
 from modelos.modelo_profesor import ModeloProfesor
 from modelos.modelo_votacion import ModeloVotacion
 from modelos.conexion_BD import obtener_conexion_db
-from DetectarPulgar import detectar_pulgar_arriba 
+from DetectarPulgar import detectar_pulgar_arriba
+ 
 import mysql.connector
 
 class ControladorEstudiante:
@@ -16,6 +17,32 @@ class ControladorEstudiante:
         self.modelo_votacion = ModeloVotacion()
         self.user_id = user_id 
         self.rol = 'Estudiante'
+
+
+    def _manejar_registro(self):
+        # Lógica de registro existente (mantiene la validación con gesto)
+        datos = self.vista.obtener_datos_registro()
+        nombre, apellido, matricula, email, username, password = datos
+        
+        if not all(datos):
+            self.vista.mostrar_mensaje("❌ Todos los campos son obligatorios.")
+            return
+
+        gesto_detectado = detectar_pulgar_arriba()
+        
+        if not gesto_detectado:
+            datosProfesor = self.vista.obtener_datos_profesor()
+            if not all(datosProfesor):
+                self.vista.mostrar_mensaje("x Todos los campos son obligatorios")
+                return
+
+        datosGenerales = (username, nombre, apellido, matricula, email, gesto_detectado)
+
+            
+        success, mensaje = self.modelo_usuario.registrar_estudiante(datosGenerales, password)
+        
+        self.vista.mostrar_mensaje(f"{mensaje}")
+
 
     def iniciar_menu(self):
         # Flujo de POST-LOGIN (Votar y Perfil - Limpio)
@@ -104,26 +131,7 @@ class ControladorEstudiante:
             if conexion and conexion.is_connected():
                 conexion.close()
                 
-    def _manejar_registro(self):
-        # Lógica de registro existente (mantiene la validación con gesto)
-        datos = self.vista.obtener_datos_registro()
-        nombre, apellido, matricula, email, username, password = datos
-        
-        if not all(datos):
-            self.vista.mostrar_mensaje("❌ Todos los campos son obligatorios.")
-            return
 
-        self.vista.solicitar_confirmacion_gesto()
-        
-        gesto_detectado = detectar_pulgar_arriba()
-        
-        if not gesto_detectado:
-            self.vista.mostrar_mensaje("❌ Gesto de Pulgar Arriba no detectado. Registro cancelado.")
-            return
-            
-        success, mensaje = self.modelo_usuario.registrar_estudiante((username, nombre, apellido, matricula, email), password)
-        
-        self.vista.mostrar_mensaje(f"{mensaje}")
 
     # ... Resto de métodos de ControladorEstudiante (_manejar_edicion_perfil, _manejar_recomendaciones, etc.) ...
     def _manejar_edicion_perfil(self):

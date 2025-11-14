@@ -6,6 +6,7 @@ from modelos.modelo_usuario import ModeloUsuario
 import traceback 
 
 def mostrar_menu_principal():
+    print("\n"*80)
     print("\n==================================")
     print("=== PROYECTO BASE DE DATOS ===")
     print("==================================")
@@ -26,6 +27,7 @@ if __name__ == "__main__":
         opcion = mostrar_menu_principal()
 
         if opcion == '1':
+            print("\n"*80)
             
             print("\n--- SELECCIÓN DE ROL ---")
             print("1. Estudiante")
